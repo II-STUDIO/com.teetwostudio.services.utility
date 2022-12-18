@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Services
+namespace Services.Utility
 {
     /// <summary>
     /// Like PlayerPrefs of UnityEngine but marge for eaizy to use.

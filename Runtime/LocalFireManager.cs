@@ -1,7 +1,7 @@
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Services.FireLocalization
+namespace Services.Utility.FireLocalization
 {
     /// <summary>
     /// Fire object serializer for mobile and pc data chace.

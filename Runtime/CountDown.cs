@@ -1,6 +1,6 @@
 using System;
 
-namespace Services
+namespace Services.Utility
 {
     public struct CountDown
     {

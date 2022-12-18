@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Services
+namespace Services.Utility
 {
     public class ParallaxEffect2D : MonoBehaviour
     {

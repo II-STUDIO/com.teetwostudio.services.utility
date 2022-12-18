@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Services
+namespace Services.Utility
 {
     /// <summary>
     /// Color string key content value.
@@ -17,7 +17,7 @@ namespace Services
     /// <summary>
     /// The service utility helper for eaisy to use.
     /// </summary>
-    public static class Utility
+    public static class UtilityExtension
     {
         #region Vector
         public static float Distance(Vector3 a, Vector3 b) => (a - b).magnitude;
