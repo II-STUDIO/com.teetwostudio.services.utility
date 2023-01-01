@@ -21,11 +21,31 @@ namespace Services
 
         public bool IsInitialized { get; private set; }
 
+        public AnimationClip Clip
+        {
+            get => clip;
+        }
+
         public void Initialize(Animation animation)
         {
+            if (!animation)
+            {
+                Debug.LogWarningFormat("The animation handle can't initialize because input property 'animation' is null or empty");
+                return;
+            }
+
             _animation = animation;
 
             IsInitialized = true;
+
+            if (!clip)
+            {
+                Debug.LogWarningFormat("The animation clib is null or empty");
+                return;
+            }
+
+            if (!animation.GetClip(clip.name))
+                animation.AddClip(clip, clip.name);
 
             _clibMillisecond = (int)(clip.length * 1000);
         }
@@ -41,6 +61,12 @@ namespace Services
             if (!IsInitialized)
             {
                 Debug.LogWarningFormat("Aniamtion handle need to initailize first");
+                return;
+            }
+
+            if (!clip)
+            {
+                Debug.LogWarningFormat("The animation clib is null or empty");
                 return;
             }
 

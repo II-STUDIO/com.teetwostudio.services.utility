@@ -79,35 +79,6 @@ namespace Services.Utility
             return stringArray;
         }
 
-        public static Vector3 MouseWorldPosition()
-        {
-            return ScreenToWordPoint(Input.mousePosition);
-        }
-
-        public static bool MouseWorldHit(out RaycastHit hit)
-        {
-            Ray ray = ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out hit);
-        }
-
-        public static bool MouseWorldHit(out RaycastHit hit, LayerMask layerMask)
-        {
-            Ray ray = ScreenPointToRay(Input.mousePosition);
-            return Physics.Raycast(ray, out hit, 100f, layerMask);
-        }
-
-        public static bool MouseWorldHitNonAlloc(RaycastHit[] hit)
-        {
-            Ray ray = ScreenPointToRay(Input.mousePosition);
-            return Physics.RaycastNonAlloc(ray, hit) >= 1;
-        }
-
-        public static bool MouseWorldHitNonAlloc(RaycastHit[] hit, LayerMask layerMask)
-        {
-            Ray ray = ScreenPointToRay(Input.mousePosition);
-            return Physics.RaycastNonAlloc(ray, hit, 100f, layerMask) >= 1;
-        }
-
         public static Vector3 ScreenToWordPoint(Vector3 screenPos, Camera camera = null)
         {
             if (!camera) 

@@ -4,7 +4,7 @@ using UnityEditor;
 using System;
 using UnityEditor.AnimatedValues;
 
-namespace Services
+namespace Services.Utility
 {
     /// <summary>
     /// This calss contain key fo editor GUI style.
