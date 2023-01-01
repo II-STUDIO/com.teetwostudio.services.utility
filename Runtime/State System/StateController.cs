@@ -2,61 +2,71 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StateMachine
+namespace Services.StateMachine
 {
     /// <summary>
     /// This is state controller of state machine system.
     /// </summary>
-    public class StateController<T> : MonoBehaviour
+    public class StateController<StateType, Property>
     {
-        protected State<T> curretState { get; private set; }
-
-        private Dictionary<T, Func<bool>> stateFillter = new Dictionary<T, Func<bool>>();
-
         /// <summary>
-        /// Add State condition fillter check every time on change to this type of state.
+        /// The property that your can custom to very state you create that accessable for the property.
         /// </summary>
-        /// <param name="fillterType"></param>
-        /// <param name="conditionFillter"></param>
-        public void SetStateFillter(T fillterType, Func<bool> conditionFillter)
+        public Property property { get; private set; }
+
+
+        public StateType priviousStateType { get; private set; }
+
+        protected State<StateType, Property> curretState { get; private set; }
+
+        private Dictionary<StateType, State<StateType, Property>> StateConten = new Dictionary<StateType, State<StateType, Property>>();
+
+        public void SetConten(State<StateType, Property> state)
         {
-            if (stateFillter.ContainsKey(fillterType))
-                stateFillter[fillterType] = conditionFillter;
-            else
-                stateFillter.Add(fillterType, conditionFillter);
+            if(StateConten.ContainsKey(state.type))
+            {
+                Debug.LogWarningFormat($"State type <{state.type}> aready set in the state conten of the controller");
+                return;
+            }
+
+            StateConten.Add(state.type, state);
+        }
+
+        public void SetProperty(Property property)
+        {
+            this.property = property;
         }
 
         /// <summary>
         /// Call for change state to target state.
         /// </summary>
-        /// <param name="targetState"></param>
-        public virtual void Change(State<T> targetState)
+        /// <param name="stateType"></param>
+        public virtual void Change(StateType stateType)
         {
-            if(stateFillter.ContainsKey(targetState.type))
+            if (curretState != null)
             {
-                var fillterValidable = stateFillter[targetState.type];
-                if (!fillterValidable.Invoke())
-                    return;
+                priviousStateType = curretState.type;
+                curretState.Exit();
             }
 
-            if (curretState != null)
-                curretState.Exit();
+            curretState = StateConten[stateType];
 
-            curretState = targetState;
+            if(curretState == null)
+            {
+                Debug.LogErrorFormat($"State type <{stateType}> not extis or set conten for the controller");
+                return;
+            }
+
             curretState.Init(this);
             curretState.Enter();
         }
 
-        private void Update()
+        protected virtual void Update(float deltaTime)
         {
-            curretState?.Update();
+            if(curretState == null)
+                return;
 
-            OnUpdate();
+            curretState.Update(deltaTime);
         }
-
-        /// <summary>
-        /// Invoke every frame.
-        /// </summary>
-        protected virtual void OnUpdate() { }
     }
 }

@@ -5,7 +5,7 @@ namespace Services.Utility
     /// <summary>
     /// Like PlayerPrefs of UnityEngine but marge for eaizy to use.
     /// </summary>
-    public static class SaveSystem
+    public static class DeviceCache
     {
         public static string FindStringData(string key)
         {
