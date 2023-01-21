@@ -13,7 +13,7 @@ namespace Services
         public Raycaster()
         {
             Hits = new RaycastHit[1];
-            Count = 0;
+            HitCount = 0;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Services
         public Raycaster(int maxHitContainable)
         {
             Hits = new RaycastHit[maxHitContainable];
-            Count = 0;
+            HitCount = 0;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Services
         /// <summary>
         /// Count of currenct of lasted raycast hits maximum is follow 'Hits' lengh.
         /// </summary>
-        public int Count { get; private set; }
+        public int HitCount { get; private set; }
 
         public bool IsReady { get; private set; }
 
@@ -55,7 +55,7 @@ namespace Services
         /// </summary>
         public RaycastHit LastHit
         {
-            get => Hits[Count];
+            get => Hits[HitCount - 1];
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Services
         /// </summary>
         public bool IsEmpty
         {
-            get => Count == 0;
+            get => HitCount == 0;
         }
 
 
@@ -125,9 +125,9 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            Count = Physics.RaycastNonAlloc(_ray, Hits);
+            HitCount = Physics.RaycastNonAlloc(_ray, Hits);
 
-            return Count > 0;
+            return HitCount > 0;
         }
 
         /// <summary>
@@ -145,9 +145,9 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            Count = Physics.RaycastNonAlloc(_ray, Hits, distance);
+            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance);
 
-            return Count > 0;
+            return HitCount > 0;
         }
 
         /// <summary>
@@ -166,9 +166,9 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            Count = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
+            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
 
-            return Count > 0;
+            return HitCount > 0;
         }
 
         /// <summary>
@@ -187,9 +187,9 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            Count = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, QueryTriggerInteraction.Ignore);
+            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, QueryTriggerInteraction.Ignore);
 
-            return Count > 0;
+            return HitCount > 0;
         }
 
         private void CheckUseLastedTransformAndAutoSetup()

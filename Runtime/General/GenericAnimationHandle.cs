@@ -20,6 +20,7 @@ namespace Services
         private int _clibMillisecond;
 
         public bool IsInitialized { get; private set; }
+        public float Time { get; private set; }
 
         public AnimationClip Clip
         {
@@ -47,7 +48,9 @@ namespace Services
             if (!animation.GetClip(clip.name))
                 animation.AddClip(clip, clip.name);
 
-            _clibMillisecond = (int)(clip.length * 1000);
+            Time = clip.length;
+
+            _clibMillisecond = (int)(Time * 1000);
         }
 
         public void SetListener(EventAction onStart, EventAction onComplete)

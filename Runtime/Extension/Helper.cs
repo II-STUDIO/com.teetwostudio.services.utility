@@ -17,7 +17,7 @@ namespace Services.Utility
     /// <summary>
     /// The service utility helper for eaisy to use.
     /// </summary>
-    public static class UtilityExtension
+    public static class Helper
     {
         #region Vector
         public static float Distance(Vector3 a, Vector3 b) => (a - b).magnitude;

@@ -14,7 +14,6 @@ namespace Services.StateMachine
         /// </summary>
         public Property property { get; private set; }
 
-
         public StateType priviousStateType { get; private set; }
 
         protected State<StateType, Property> curretState { get; private set; }
@@ -61,7 +60,7 @@ namespace Services.StateMachine
             curretState.Enter();
         }
 
-        protected virtual void Update(float deltaTime)
+        public virtual void Update(float deltaTime)
         {
             if(curretState == null)
                 return;

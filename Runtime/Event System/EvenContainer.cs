@@ -6,6 +6,7 @@ using System;
 namespace Services.EventsSystem
 {
     [AddComponentMenu("Service/Utilities/EvenContainer")]
+    [DisallowMultipleComponent]
     public class EvenContainer : MonoBehaviour
     {
         [Serializable]
