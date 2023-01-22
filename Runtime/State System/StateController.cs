@@ -55,7 +55,7 @@ namespace Services.StateMachine
         /// Call for change state to target state.
         /// </summary>
         /// <param name="state"></param>
-        public virtual void Change(State state)
+        public virtual void Change(State<StateType, Property> state)
         {
             if (curretState != null)
             {
@@ -69,7 +69,7 @@ namespace Services.StateMachine
                 return;
             }
 
-            curretState = StateConten[state];
+            curretState = state;
 
             curretState.Init(this);
             curretState.Enter();
