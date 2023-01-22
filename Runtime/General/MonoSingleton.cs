@@ -9,20 +9,7 @@ namespace Services
             get
             {
                 if (!_instance)
-                {
-                    Inherister[] inheristers = FindObjectsOfType<Inherister>();
-
-                    if (inheristers == null)
-                    {
-                        Debug.LogError("The type of <{nameof(Inherister)}> not arriv or found.");
-                        return null;
-                    }
-
-                    if (inheristers.Length > 1)
-                        Debug.LogWarning($"The type of <{nameof(Inherister)}> arrived more that one.");
-
-                    _instance = inheristers[0];
-                }
+                    SetInstance();
 
                 return _instance;
             }
@@ -33,6 +20,28 @@ namespace Services
         protected virtual void Awake()
         {
             SetInstance(GetComponent<Inherister>());
+        }
+
+        /// <summary>
+        /// Force set global instance.
+        /// </summary>
+        public static void SetInstance() 
+        {
+            if (_instance)
+                return;
+
+            Inherister[] inheristers = FindObjectsOfType<Inherister>();
+
+            if (inheristers == null)
+            {
+                Debug.LogError("The type of <{nameof(Inherister)}> not arriv or found.");
+                return null;
+            }
+
+            if (inheristers.Length > 1)
+                Debug.LogWarning($"The type of <{nameof(Inherister)}> arrived more that one.");
+
+            _instance = inheristers[0];
         }
 
         /// <summary>
