@@ -63,13 +63,13 @@ namespace Services.StateMachine
                 curretState.Exit();
             }
 
-            if (curretState == null)
+            curretState = state;
+
+            if (state == null)
             {
                 Debug.LogErrorFormat($"The state can't be null");
                 return;
             }
-
-            curretState = state;
 
             curretState.Init(this);
             curretState.Enter();
