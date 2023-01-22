@@ -36,6 +36,15 @@ namespace Services
         }
 
         /// <summary>
+        /// Check the status of this instance static object can't check null form Instance property because Instance property away find the validable access can check only this function.
+        /// </summary>
+        /// <returns>Ture if 'Instance' not be null</returns>
+        public bool IsInstanceValidable()
+        {
+            return _instance;
+        }
+
+        /// <summary>
         /// Set this panel to instance
         /// </summary>
         /// <param name="inheriter"></param>
