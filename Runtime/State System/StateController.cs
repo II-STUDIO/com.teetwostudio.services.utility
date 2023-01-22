@@ -37,10 +37,25 @@ namespace Services.StateMachine
         }
 
         /// <summary>
-        /// Call for change state to target state.
+        /// Call for change state to target state with state type.
         /// </summary>
         /// <param name="stateType"></param>
-        public virtual void Change(StateType stateType)
+        public virtual void ChangeByType(StateType stateType)
+        {
+            if (!StateConten.ContainsKey(stateType))
+            {
+                Debug.LogErrorFormat($"State type <{stateType}> not extis or set conten for the controller");
+                return;
+            }
+
+            Change(StateConten[stateType]);
+        }
+
+        /// <summary>
+        /// Call for change state to target state.
+        /// </summary>
+        /// <param name="state"></param>
+        public virtual void Change(State state)
         {
             if (curretState != null)
             {
@@ -48,13 +63,13 @@ namespace Services.StateMachine
                 curretState.Exit();
             }
 
-            curretState = StateConten[stateType];
-
-            if(curretState == null)
+            if (curretState == null)
             {
-                Debug.LogErrorFormat($"State type <{stateType}> not extis or set conten for the controller");
+                Debug.LogErrorFormat($"The state can't be null");
                 return;
             }
+
+            curretState = StateConten[state];
 
             curretState.Init(this);
             curretState.Enter();
