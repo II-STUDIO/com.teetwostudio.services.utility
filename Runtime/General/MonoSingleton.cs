@@ -25,6 +25,14 @@ namespace Services
 
         protected virtual void Awake()
         {
+            SetInstance();
+        }
+
+        public void SetInstance()
+        {
+            if (_instance)
+                return;
+
             _instance = SingletonHelper.GetInstance(gameObject, _instance);
         }
 
