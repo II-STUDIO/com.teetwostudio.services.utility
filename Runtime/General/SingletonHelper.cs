@@ -8,7 +8,7 @@ namespace Services.Utility.Core
         /// <summary>
         /// Find global instance.
         /// </summary>
-        public static Inherister FindInstance<Inherister>(Inherister instance, SingleonAccessType accessType = SingleonAccessType.FindExited) where Inherister : MonoBehaviour
+        public static Inherister FindInstance<Inherister>(Inherister instance) where Inherister : MonoBehaviour
         {
             if (instance)
                 return instance;
@@ -17,12 +17,7 @@ namespace Services.Utility.Core
 
             if (inheristers == null || inheristers.Length == 0)
             {
-                if (accessType == SingleonAccessType.FindExited)
-                {
-                    Debug.LogError("The type of <{nameof(Inherister)}> not arriv or found.");
-                    return null;
-                }
-
+                Debug.LogWarning("The type of <{nameof(Inherister)}> not arriv or found -> auto generate one.");
                 return new GameObject(nameof(Inherister) + " - Singleton (Auto Create)").AddComponent<Inherister>();
             }
 

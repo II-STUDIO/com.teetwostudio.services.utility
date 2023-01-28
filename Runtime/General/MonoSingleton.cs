@@ -5,17 +5,12 @@ namespace Services
 {
     public class MonoSingleton<Inherister> : MonoBehaviour where Inherister : MonoBehaviour
     {
-        /// <summary>
-        /// The access of instance finder type default is 'FindExited'.
-        /// </summary>
-        protected static SingleonAccessType AccessType { get; set; } = SingleonAccessType.FindExited;
-
         public static Inherister Instance
         {
             get
             {
                 if (!_instance)
-                    _instance = SingletonHelper.FindInstance(_instance, AccessType);
+                    _instance = SingletonHelper.FindInstance(_instance);
 
                 return _instance;
             }
