@@ -1,15 +1,21 @@
 using UnityEngine;
+using Services.Utility.Core;
 
 namespace Services
 {
     public class MonoSingleton<Inherister> : MonoBehaviour where Inherister : MonoBehaviour
     {
+        /// <summary>
+        /// The access of instance finder type default is 'FindExited'.
+        /// </summary>
+        protected static SingleonAccessType AccessType { get; set; } = SingleonAccessType.FindExited;
+
         public static Inherister Instance
         {
             get
             {
                 if (!_instance)
-                    SetInstance();
+                    _instance = SingletonHelper.FindInstance(_instance, AccessType);
 
                 return _instance;
             }
@@ -19,29 +25,7 @@ namespace Services
 
         protected virtual void Awake()
         {
-            SetInstance(GetComponent<Inherister>());
-        }
-
-        /// <summary>
-        /// Force set global instance.
-        /// </summary>
-        public static void SetInstance() 
-        {
-            if (_instance)
-                return;
-
-            Inherister[] inheristers = FindObjectsOfType<Inherister>(true);
-
-            if (inheristers == null)
-            {
-                Debug.LogError("The type of <{nameof(Inherister)}> not arriv or found.");
-                return;
-            }
-
-            if (inheristers.Length > 1)
-                Debug.LogWarning($"The type of <{nameof(Inherister)}> arrived more that one.");
-
-            _instance = inheristers[0];
+            _instance = SingletonHelper.GetInstance(gameObject, _instance);
         }
 
         /// <summary>
@@ -51,30 +35,6 @@ namespace Services
         public bool IsInstanceValidable()
         {
             return _instance;
-        }
-
-        /// <summary>
-        /// Set this panel to instance
-        /// </summary>
-        /// <param name="inheriter"></param>
-        protected void SetInstance(Inherister inheriter, SigletonPlacementType replacementType = SigletonPlacementType.Noramal)
-        {
-            if (inheriter == null)
-                return;
-
-            switch (replacementType)
-            {
-                case SigletonPlacementType.Noramal:
-                    if (_instance)
-                        return;
-                    break;
-                case SigletonPlacementType.DontroyPrivious:
-                    if (_instance)
-                        Destroy(Instance.gameObject);
-                    break;
-            }
-
-            _instance = inheriter;
         }
     }
 }
