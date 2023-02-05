@@ -17,8 +17,9 @@ namespace Services.Utility.Core
 
             if (inheristers == null || inheristers.Length == 0)
             {
-                Debug.LogWarning("The type of <{nameof(Inherister)}> not arriv or found -> auto generate one.");
-                return new GameObject(nameof(Inherister) + " - Singleton (Auto Create)").AddComponent<Inherister>();
+                string name = typeof(Inherister).Name;
+                Debug.LogWarning($"The type of <{name}> not arriv or found -> auto generate one.");
+                return new GameObject(name + " - Singleton (Auto Create)").AddComponent<Inherister>();
             }
 
             if (inheristers.Length > 1)
