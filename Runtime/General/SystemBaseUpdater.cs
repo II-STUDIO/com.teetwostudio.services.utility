@@ -14,7 +14,7 @@ namespace Services
 
             base.Awake();
 
-            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(gameObject);
 
             StartCoroutine(CoroutinUpdater());
         }
