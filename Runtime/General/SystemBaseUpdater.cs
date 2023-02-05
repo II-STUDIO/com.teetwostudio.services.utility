@@ -7,6 +7,13 @@ namespace Services
 
         private CoroutinUpdatable coroutinUpdatable;
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            StartCoroutine(CoroutinUpdater());
+        }
+
         private IEnumerator CoroutinUpdater()
         {
             while (true)
