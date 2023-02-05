@@ -27,7 +27,8 @@ namespace Services
             {
                 SystemTime.UpdateDeltaTime();
 
-                coroutinUpdatable(SystemTime.DeltaTime);
+                if (coroutinUpdatable != null)
+                    coroutinUpdatable(SystemTime.DeltaTime);
 
                 yield return null;
             }
@@ -41,6 +42,11 @@ namespace Services
         public void RemoveUpdater(CoroutinUpdatable updatable)
         {
             coroutinUpdatable -= updatable;
+        }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();   
         }
     }
 
