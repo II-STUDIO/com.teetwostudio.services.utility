@@ -4,20 +4,6 @@ namespace Services
 {
     public class SystemBaseUpdater : MonoSingleton<SystemBaseUpdater>
     {
-        protected override void Awake()
-        {
-            if (IsInstanceValidable())
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            base.Awake();
-
-            DontDestroyOnLoad(gameObject);
-
-            StartCoroutine(CoroutinUpdater());
-        }
 
         private CoroutinUpdatable coroutinUpdatable;
 
@@ -44,9 +30,9 @@ namespace Services
             coroutinUpdatable -= updatable;
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
-            StopAllCoroutines();   
+            StopAllCoroutines();
         }
     }
 
