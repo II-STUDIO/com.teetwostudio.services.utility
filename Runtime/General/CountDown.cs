@@ -1,4 +1,6 @@
+using Services.EventsSystem;
 using System;
+using UnityEngine;
 
 namespace Services
 {
@@ -16,8 +18,12 @@ namespace Services
             get => _countDownStep == 0f;
         }
 
-        public Action<float> onStart;
-        public Action onComplete;
+        [Tooltip("Invoke when start countdown")]
+        public EventAction<float> onStart;
+        [Tooltip("Invoke every countodwn update")]
+        public EventAction<float> onUpdate;
+        [Tooltip("Invoke when countodwn complete")]
+        public EventAction onComplete;
 
 
         public void Start(float countDownTime)
@@ -59,6 +65,8 @@ namespace Services
                 return;
 
             _countDownStep -= deltaTime;
+
+            onUpdate?.Invoke(_countDownStep);
 
             if (_countDownStep > 0f)
                 return;
