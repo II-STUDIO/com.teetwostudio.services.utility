@@ -5,7 +5,12 @@ namespace Services.Utility
     [Serializable]
     public struct IntHandle
     {
-        public int value { get; private set; }
+        private int value;
+
+        public int Value
+        {
+            get => value;
+        }
 
         public Action onValueChanged { get; set; }
         public Action<int> onValueChangedWithValue { get; set; }
@@ -32,30 +37,6 @@ namespace Services.Utility
 
             onValueChanged?.Invoke();
             onValueChangedWithValue?.Invoke(this.value);
-        }
-
-        public static IntHandle operator +(IntHandle a, IntHandle b)
-        {
-            a.Increase(b.value);
-            return a;
-        }
-
-        public static IntHandle operator -(IntHandle a, IntHandle b)
-        {
-            a.Decrease(b.value);
-            return a;
-        }
-
-        public static IntHandle operator +(IntHandle a, int b)
-        {
-            a.Increase(b);
-            return a;
-        }
-
-        public static IntHandle operator -(IntHandle a, int b)
-        {
-            a.Decrease(b);
-            return a;
         }
     }
 
@@ -89,30 +70,6 @@ namespace Services.Utility
 
             onValueChanged?.Invoke();
             onValueChangedWithValue?.Invoke(this.value);
-        }
-
-        public static FloatHandle operator +(FloatHandle a, FloatHandle b)
-        {
-            a.Increase(b.value);
-            return a;
-        }
-
-        public static FloatHandle operator -(FloatHandle a, FloatHandle b)
-        {
-            a.Decrease(b.value);
-            return a;
-        }
-
-        public static FloatHandle operator +(FloatHandle a, int b)
-        {
-            a.Increase(b);
-            return a;
-        }
-
-        public static FloatHandle operator -(FloatHandle a, int b)
-        {
-            a.Decrease(b);
-            return a;
         }
     }
 }
