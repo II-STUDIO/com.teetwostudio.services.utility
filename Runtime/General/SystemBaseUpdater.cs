@@ -5,7 +5,7 @@ namespace Services
     public class SystemBaseUpdater : MonoSingleton<SystemBaseUpdater>
     {
 
-        private CoroutinUpdatable coroutinUpdatable;
+        private static event CoroutinUpdatable coroutinUpdatable;
 
         protected override void Awake()
         {
