@@ -6,7 +6,7 @@ namespace Services.Utility.Convertion
     /// <summary>
     /// Fire string and object serializer for mobile and pc data chace.
     /// </summary>
-    public static class Converter
+    public static class XMLConverter
     {
         /// <summary>
         /// Serialize onject to string with XML serializer.
