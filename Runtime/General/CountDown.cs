@@ -6,17 +6,7 @@ namespace Services
 {
     public struct CountDown
     {
-        private float _countDownStep;
-
-        public float currnetDuration
-        {
-            get => _countDownStep;
-        }
-
-        public bool isComplelted
-        {
-            get => _countDownStep == 0f;
-        }
+        private float currentTime;
 
         [Tooltip("Invoke when start countdown")]
         public EventAction<float> onStart;
@@ -25,6 +15,28 @@ namespace Services
         [Tooltip("Invoke when countodwn complete")]
         public EventAction onComplete;
 
+        private bool isAutoUpdate;
+        private bool isPause;
+
+        public float CurrentTime
+        {
+            get => currentTime;
+        }
+
+        public bool IsCounting
+        {
+            get => currentTime > 0f;
+        }
+
+        public CountDown(bool autoupdate)
+        {
+            isAutoUpdate = autoupdate;
+            isPause = false;
+            onStart = null;
+            onUpdate = null;
+            onComplete = null;
+            currentTime = 0f;
+        }
 
         public void Start(float countDownTime)
         {
@@ -36,44 +48,78 @@ namespace Services
                 return;
             }
 
-            _countDownStep = countDownTime;
+            if (isAutoUpdate)
+                SystemBaseUpdater.Instance.AddUpdater(Update);
+
+            currentTime = countDownTime;
         }
 
         public void ForceComplete()
         {
-            if (isComplelted)
+            if (!IsCounting)
                 return;
 
-            _countDownStep = 0f;
-
-            onComplete?.Invoke();
+            Completed();
         }
 
+        //
+        // Summary:
+        //     Like pause but can't resume counting until start.
         public void Clear()
         {
-            _countDownStep = 0f;
+            currentTime = 0f;
+
+            if (isAutoUpdate)
+                SystemBaseUpdater.Instance.AddUpdater(Update);
+        }
+
+        //
+        // Summary:
+        //     Pause counting.
+        public void Pause()
+        {
+            isPause = true;
+        }
+
+        //
+        // Summary:
+        //     Resume counting.
+        public void Resume()
+        {
+            isPause = false;
         }
 
         public void Add(float countDownTime)
         {
-            _countDownStep += countDownTime;
+            currentTime += countDownTime;
         }
 
         public void Update(float deltaTime)
         {
-            if (_countDownStep == 0f)
+            if (isPause)
                 return;
 
-            _countDownStep -= deltaTime;
-
-            onUpdate?.Invoke(_countDownStep);
-
-            if (_countDownStep > 0f)
+            if (currentTime == 0f)
                 return;
 
-            _countDownStep = 0f;
+            currentTime -= deltaTime;
+
+            onUpdate?.Invoke(currentTime);
+
+            if (IsCounting)
+                return;
+
+            Completed();
+        }
+
+        private void Completed()
+        {
+            currentTime = 0f;
 
             onComplete?.Invoke();
+
+            if (isAutoUpdate)
+                SystemBaseUpdater.Instance.AddUpdater(Update);
         }
     }
 }

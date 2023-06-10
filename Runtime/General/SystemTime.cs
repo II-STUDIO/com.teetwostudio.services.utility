@@ -13,6 +13,9 @@ namespace Services
             get => deltaTime;
         }
 
+        //
+        // Summary:
+        //     Update deltatime.
         public static void UpdateDeltaTime()
         {
             deltaTime = Time.deltaTime;
