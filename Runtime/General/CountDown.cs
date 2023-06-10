@@ -48,7 +48,7 @@ namespace Services
                 return;
             }
 
-            if (isAutoUpdate)
+            if (isAutoUpdate && !IsCounting)
                 SystemBaseUpdater.Instance.AddUpdater(Update);
 
             currentTime = countDownTime;
@@ -70,7 +70,7 @@ namespace Services
             currentTime = 0f;
 
             if (isAutoUpdate)
-                SystemBaseUpdater.Instance.AddUpdater(Update);
+                SystemBaseUpdater.Instance.RemoveUpdater(Update);
         }
 
         //
@@ -119,7 +119,7 @@ namespace Services
             onComplete?.Invoke();
 
             if (isAutoUpdate)
-                SystemBaseUpdater.Instance.AddUpdater(Update);
+                SystemBaseUpdater.Instance.RemoveUpdater(Update);
         }
     }
 }
