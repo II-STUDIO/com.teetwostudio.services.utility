@@ -4,6 +4,8 @@ using UnityEngine;
 public struct AnimtorParamSrtingToHash
 {
     public string name;
+    [Range(0.02f, 0.1f)]
+    public float dampTime;
 
     private bool isConverted;
 
