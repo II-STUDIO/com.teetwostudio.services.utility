@@ -1,15 +1,19 @@
 {
     "name": "com.teetwostudio.services.utility",
-    "version": "0.0.1",
-    "unityRelease": "11f1",
+    "version": "1.0.0",
+    "unityRelease": "2f1",
     "displayName": "TEE II Studio Services Utility",
     "description": "This utility save writ same many script time.",
+    "dependencies": {
+      "com.teetwostudio.services.utility": "0.0.1",
+      "com.unity.2d.sprite": "1.0.0"
+    },
     "keywords": [
       "Utility",
       "Services"
     ],
     "category": "Utility",
-    "unity": "2021.3",
+    "unity": "2022.3",
     "author": {
       "name": "TEE II studio",
       "email": "watchaphon40225@gmail.com"

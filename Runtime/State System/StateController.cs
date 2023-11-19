@@ -7,20 +7,20 @@ namespace Services.StateMachine
     /// <summary>
     /// This is state controller of state machine system.
     /// </summary>
-    public class StateController<StateType, Property>
+    public class StateController<TType, TContext>
     {
         /// <summary>
         /// The property that your can custom to very state you create that accessable for the property.
         /// </summary>
-        public Property property { get; private set; }
+        public TContext context { get; private set; }
 
-        public StateType priviousStateType { get; private set; }
+        public TType priviousStateType { get; private set; }
 
-        protected State<StateType, Property> curretState { get; private set; }
+        protected State<TType, TContext> curretState { get; private set; }
 
-        private Dictionary<StateType, State<StateType, Property>> StateConten = new Dictionary<StateType, State<StateType, Property>>();
+        private Dictionary<TType, State<TType, TContext>> StateConten = new Dictionary<TType, State<TType, TContext>>();
 
-        public void SetConten(State<StateType, Property> state)
+        public void SetConten(State<TType, TContext> state)
         {
             if(StateConten.ContainsKey(state.type))
             {
@@ -31,16 +31,16 @@ namespace Services.StateMachine
             StateConten.Add(state.type, state);
         }
 
-        public void SetProperty(Property property)
+        public void SetContext(TContext context)
         {
-            this.property = property;
+            this.context = context;
         }
 
         /// <summary>
         /// Call for change state to target state with state type.
         /// </summary>
         /// <param name="stateType"></param>
-        public virtual void ChangeByType(StateType stateType)
+        public virtual void ChangeByType(TType stateType)
         {
             if (!StateConten.ContainsKey(stateType))
             {
@@ -55,7 +55,7 @@ namespace Services.StateMachine
         /// Call for change state to target state.
         /// </summary>
         /// <param name="state"></param>
-        public virtual void Change(State<StateType, Property> state)
+        public virtual void Change(State<TType, TContext> state)
         {
             if (curretState != null)
             {

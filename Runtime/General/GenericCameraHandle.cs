@@ -41,7 +41,7 @@ namespace Services
         public Vector3 GetMouseWorldPoint()
         {
             if (!_camera)
-                Debug.LogErrorFormat("Please assing camera or initialize the handle");
+                throw new NullReferenceException("Please assing camera or initialize the handle");
 
             return ScreenPointToWorld(Input.mousePosition);
         }
@@ -49,7 +49,7 @@ namespace Services
         public Ray GetMouseRay()
         {
             if (!_camera)
-                Debug.LogErrorFormat("Please assing camera or initialize the handle");
+                throw new NullReferenceException("Please assing camera or initialize the handle");
 
             return ScreenPointToRay(Input.mousePosition);
         }
@@ -57,7 +57,7 @@ namespace Services
         public Ray ScreenPointToRay(Vector3 screenPoint)
         {
             if (!_camera)
-                Debug.LogErrorFormat("Please assing camera or initialize the handle");
+                throw new NullReferenceException("Please assing camera or initialize the handle");
 
             return _camera.ScreenPointToRay(screenPoint);
         }
@@ -65,7 +65,7 @@ namespace Services
         public Vector3 ScreenPointToWorld(Vector3 screenPoint)
         {
             if (!_camera)
-                Debug.LogErrorFormat("Please assing camera or initialize the handle");
+                throw new NullReferenceException("Please assing camera or initialize the handle");
 
             return _camera.ScreenToWorldPoint(screenPoint);
         }
@@ -73,7 +73,7 @@ namespace Services
         public Vector3 WorldToScreenPoint(Vector3 worldPoint)
         {
             if (!_camera)
-                Debug.LogErrorFormat("Please assing camera or initialize the handle");
+                throw new NullReferenceException("Please assing camera or initialize the handle");
 
             return _camera.WorldToScreenPoint(worldPoint);
         }

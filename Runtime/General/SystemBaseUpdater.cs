@@ -1,30 +1,28 @@
 using System.Collections;
+using UnityEngine;
 
 namespace Services
 {
     public class SystemBaseUpdater : MonoSingleton<SystemBaseUpdater>
     {
+        [SerializeField] private bool dontDestroyOnLoad = true;
 
-        private static event CoroutinUpdatable coroutinUpdatable;
+        private event CoroutinUpdatable coroutinUpdatable;
 
         protected override void Awake()
         {
             base.Awake();
 
-            StartCoroutine(CoroutinUpdater());
+            if (dontDestroyOnLoad)
+                DontDestroyOnLoad(gameObject);
         }
 
-        private IEnumerator CoroutinUpdater()
+        private void Update()
         {
-            while (true)
-            {
-                SystemTime.UpdateDeltaTime();
+            SystemTime.UpdateDeltaTime();
 
-                if (coroutinUpdatable != null)
-                    coroutinUpdatable(SystemTime.DeltaTime);
-
-                yield return null;
-            }
+            if (coroutinUpdatable != null)
+                coroutinUpdatable(SystemTime.DeltaTime);
         }
 
         public void AddUpdater(CoroutinUpdatable updatable)
@@ -35,11 +33,6 @@ namespace Services
         public void RemoveUpdater(CoroutinUpdatable updatable)
         {
             coroutinUpdatable -= updatable;
-        }
-
-        private void OnDisable()
-        {
-            StopAllCoroutines();
         }
     }
 
