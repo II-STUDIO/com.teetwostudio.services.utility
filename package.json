@@ -1,6 +1,6 @@
 {
     "name": "com.teetwostudio.services.utility",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "unityRelease": "2f1",
     "displayName": "TEE II Studio Services Utility",
     "description": "This utility save writ same many script time.",
