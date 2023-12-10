@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Services
 {
     [Serializable]
-    public struct GenericTransition
+    public class GenericTransition
     {
         [SerializeField] private Animation animation;
         [Space]

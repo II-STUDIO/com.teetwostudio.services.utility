@@ -40,7 +40,7 @@ namespace Services.StateMachine
         /// Call for change state to target state with state type.
         /// </summary>
         /// <param name="stateType"></param>
-        public virtual void ChangeByType(TType stateType)
+        public virtual void Change(TType stateType)
         {
             if (!StateConten.ContainsKey(stateType))
             {
