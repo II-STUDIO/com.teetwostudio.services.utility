@@ -32,6 +32,38 @@ namespace Services.Utility
         /// <returns>Selecting index</returns>
         public static int SelectTaps(string[] menu, int index) => GUILayout.Toolbar(index, menu);
 
+        public static string DetectTextField(UnityEngine.Object obj, string label, string value, string undoAction)
+        {
+            var targetValue = EditorGUILayout.TextField(label, value);
+
+            if (targetValue != value)
+            {
+                Undo.RecordObject(obj, undoAction);
+
+                EditorUtility.SetDirty(obj);
+
+                return targetValue;
+            }
+
+            return value;
+        }
+
+        public static bool DetextToggleField(UnityEngine.Object obj, string label, bool value, string undoAction, params GUILayoutOption[] options)
+        {
+            var targetValue = EditorGUILayout.Toggle(label, value, options);
+
+            if (targetValue != value)
+            {
+                Undo.RecordObject(obj, undoAction);
+
+                EditorUtility.SetDirty(obj);
+
+                return targetValue;
+            }
+
+            return value;
+        }
+
         #region Horizontal
         /// <summary>
         /// Draw horizontal group.
@@ -663,6 +695,21 @@ namespace Services.Utility
             return (Material)EditorGUILayout.ObjectField(label, material, typeof(Material), true, GUILayout.Width(size), GUILayout.Height(size));
         }
         #endregion
+
+        public static GUIStyle ToMiddleCenterTextStyle(this GUIStyle style)
+        {
+            if (style == null)
+            {
+                style = new GUIStyle(GUI.skin.label);
+                style.alignment = TextAnchor.MiddleCenter;
+            }
+            else
+            {
+                style.alignment = TextAnchor.MiddleCenter;
+            }
+
+            return style;
+        }
     }
 }
 #endif
