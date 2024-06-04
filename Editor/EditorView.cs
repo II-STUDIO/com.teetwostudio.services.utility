@@ -48,6 +48,22 @@ namespace Services.Utility
             return value;
         }
 
+        public static string DetectTextField(UnityEngine.Object obj, string value, string undoAction,GUIStyle style)
+        {
+            var targetValue = EditorGUILayout.TextField(value, style);
+
+            if (targetValue != value)
+            {
+                Undo.RecordObject(obj, undoAction);
+
+                EditorUtility.SetDirty(obj);
+
+                return targetValue;
+            }
+
+            return value;
+        }
+
         public static bool DetextToggleField(UnityEngine.Object obj, string label, bool value, string undoAction, params GUILayoutOption[] options)
         {
             var targetValue = EditorGUILayout.Toggle(label, value, options);
