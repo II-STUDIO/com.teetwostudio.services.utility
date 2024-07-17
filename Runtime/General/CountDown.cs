@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Services
 {
-    public struct CountDown
+    public struct CountDown : ILoopUpdateEntity
     {
         private float currentTime;
 
@@ -14,8 +14,8 @@ namespace Services
         [Tooltip("Invoke when countodwn complete")]
         public EventAction onComplete;
 
-        private bool isAutoUpdate;
         private bool isPause;
+        private bool isAutoUpdate;
 
         public float CurrentTime
         {
@@ -27,17 +27,9 @@ namespace Services
             get => currentTime > 0f;
         }
 
-        public CountDown(bool autoupdate)
-        {
-            isAutoUpdate = autoupdate;
-            isPause = false;
-            onStart = null;
-            onUpdate = null;
-            onComplete = null;
-            currentTime = 0f;
-        }
+        public bool IsUpdatable => true;
 
-        public void Start(float countDownTime)
+        public void Start(float countDownTime, bool isAutoUpdate = false)
         {
             onStart?.Invoke(countDownTime);
 
@@ -47,10 +39,14 @@ namespace Services
                 return;
             }
 
-            if (isAutoUpdate && !IsCounting)
-                SystemBaseUpdater.Instance.AddUpdater(Update);
-
             currentTime = countDownTime;
+
+            this.isAutoUpdate = isAutoUpdate;
+
+            if (isAutoUpdate)
+            {
+                LoopUpdater.EnableEntity(this);
+            }
         }
 
         public void ForceComplete()
@@ -61,28 +57,23 @@ namespace Services
             Completed();
         }
 
-        //
-        // Summary:
-        //     Like pause but can't resume counting until start.
         public void Clear()
         {
             currentTime = 0f;
 
             if (isAutoUpdate)
-                SystemBaseUpdater.Instance.RemoveUpdater(Update);
+            {
+                LoopUpdater.DisableEntity(this);
+
+                isAutoUpdate = false;
+            }
         }
 
-        //
-        // Summary:
-        //     Pause counting.
         public void Pause()
         {
             isPause = true;
         }
 
-        //
-        // Summary:
-        //     Resume counting.
         public void Resume()
         {
             isPause = false;
@@ -93,7 +84,7 @@ namespace Services
             currentTime += countDownTime;
         }
 
-        public void Update(float deltaTime)
+        public void LoopUpdateEvent(float deltaTime)
         {
             if (isPause)
                 return;
@@ -115,10 +106,14 @@ namespace Services
         {
             currentTime = 0f;
 
-            onComplete?.Invoke();
-
             if (isAutoUpdate)
-                SystemBaseUpdater.Instance.RemoveUpdater(Update);
+            {
+                LoopUpdater.DisableEntity(this);
+
+                isAutoUpdate = false;
+            }
+
+            onComplete?.Invoke();
         }
     }
 }

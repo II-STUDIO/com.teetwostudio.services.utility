@@ -19,7 +19,7 @@ namespace Services
 
         private void Update()
         {
-            m_transform.Rotate(axis * multple * SystemTime.DeltaTime);
+            m_transform.Rotate(axis * multple * Time.deltaTime);
         }
     }
 }
