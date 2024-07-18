@@ -16,7 +16,20 @@ namespace Services.StateMachine
 
         public TType priviousStateType { get; private set; }
 
-        protected State<TType, TContext> curretState { get; private set; }
+        public TType currentStateType
+        {
+            get
+            {
+                if(curretState ==  null)
+                {
+                    return default(TType);
+                }
+
+                return curretState.type;
+            }
+        }
+
+        public State<TType, TContext> curretState { get; private set; }
 
         private Dictionary<TType, State<TType, TContext>> StateConten = new Dictionary<TType, State<TType, TContext>>();
 
