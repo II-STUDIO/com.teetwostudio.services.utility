@@ -9,6 +9,9 @@ namespace Services
         {
             get
             {
+                if (_isQuiting)
+                    return _instance;
+
                 if (!_instance)
                     _instance = SingletonHelper.FindInstance(_instance);
 
@@ -17,6 +20,7 @@ namespace Services
         }
 
         private static Inherister _instance;
+        private static bool _isQuiting = false;
 
         protected virtual void Awake()
         {
@@ -38,6 +42,11 @@ namespace Services
         public bool IsInstanceValidable()
         {
             return _instance;
+        }
+
+        private void OnApplicationQuit()
+        {
+            _isQuiting = true;
         }
     }
 }
