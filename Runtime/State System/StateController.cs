@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -49,20 +50,52 @@ namespace Services.StateMachine
             this.context = context;
         }
 
+        public virtual async UniTask ChangeAsync(TType stateType)
+        {
+            if (!StateConten.TryGetValue(stateType, out var targetState))
+            {
+                Debug.LogErrorFormat($"State type <{stateType}> not extis or set conten for the controller");
+                return;
+            }
+
+            await ChangeAsync(targetState);
+        }
+ 
+        public virtual async UniTask ChangeAsync(State<TType, TContext> state)
+        {
+            if (curretState != null)
+            {
+                priviousStateType = curretState.type;
+                await curretState.ExitAsync();
+            }
+
+            curretState = state;
+
+            if (state == null)
+            {
+                Debug.LogErrorFormat($"The state can't be null");
+                return;
+            }
+
+            curretState.Init(this);
+            curretState.Enter();
+        }
+
         /// <summary>
         /// Call for change state to target state with state type.
         /// </summary>
         /// <param name="stateType"></param>
         public virtual void Change(TType stateType)
         {
-            if (!StateConten.ContainsKey(stateType))
+            if (!StateConten.TryGetValue(stateType, out var targetState))
             {
                 Debug.LogErrorFormat($"State type <{stateType}> not extis or set conten for the controller");
                 return;
             }
 
-            Change(StateConten[stateType]);
+            Change(targetState);
         }
+
 
         /// <summary>
         /// Call for change state to target state.

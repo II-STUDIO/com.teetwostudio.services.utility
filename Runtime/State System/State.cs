@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace Services.StateMachine
 {
     /// <summary>
@@ -33,5 +35,10 @@ namespace Services.StateMachine
         /// Invoke when state controller changed this to other state.
         /// </summary>
         public abstract void Exit();
+
+        /// <summary>
+        /// Invoke when state controller changed this to other state but wait until exist task completed first.
+        /// </summary>
+        public abstract UniTask ExitAsync();
     }
 }
