@@ -7,11 +7,14 @@ namespace Services
     /// </summary>
     public class Raycaster
     {
+        private RaycastOption option;
         /// <summary>
         /// Dedicate new not allocat physic raycaster defualt container size is -> 1.
         /// </summary>
-        public Raycaster()
+        public Raycaster(RaycastOption option)
         {
+            this.option = option;
+
             Hits = new RaycastHit[1];
             HitCount = 0;
         }
@@ -19,8 +22,10 @@ namespace Services
         /// <summary>
         /// Dedicate new not allocat physic raycaster with custom max container size.
         /// </summary>
-        public Raycaster(int maxHitContainable)
+        public Raycaster(RaycastOption option, int maxHitContainable)
         {
+            this.option = option;
+
             Hits = new RaycastHit[maxHitContainable];
             HitCount = 0;
         }
@@ -111,6 +116,11 @@ namespace Services
             IsReady = true;
         }
 
+        public void DrawRay()
+        {
+            Debug.DrawRay(_ray.origin, _ray.direction, color: Color.red);
+        }
+
         /// <summary>
         ///  Create reuse raycast to detect the colliders.
         /// </summary>
@@ -125,7 +135,20 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            HitCount = Physics.RaycastNonAlloc(_ray, Hits);
+            switch (option)
+            {
+                case RaycastOption.NonAlloc:
+                    HitCount = Physics.RaycastNonAlloc(_ray, Hits);
+                    break;
+                case RaycastOption.Normal:
+                    if (Physics.Raycast(_ray, out RaycastHit hit))
+                    {
+                        HitCount = 1;
+                        Hits[0] = hit;
+                    }
+                    break;
+
+            }
 
             return HitCount > 0;
         }
@@ -147,6 +170,21 @@ namespace Services
 
             HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance);
 
+            switch (option)
+            {
+                case RaycastOption.NonAlloc:
+                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance);
+                    break;
+                case RaycastOption.Normal:
+                    if (Physics.Raycast(_ray, out RaycastHit hit, distance))
+                    {
+                        HitCount = 1;
+                        Hits[0] = hit;
+                    }
+                    break;
+
+            }
+
             return HitCount > 0;
         }
 
@@ -166,7 +204,21 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
+
+            switch (option)
+            {
+                case RaycastOption.NonAlloc:
+                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
+                    break;
+                case RaycastOption.Normal:
+                    if( Physics.Raycast(_ray,out RaycastHit hit, distance, layerMask))
+                    {
+                        HitCount = 1;
+                        Hits[0] = hit;
+                    }
+                    break;
+
+            }
 
             return HitCount > 0;
         }
@@ -187,7 +239,20 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, QueryTriggerInteraction.Ignore);
+            switch (option)
+            {
+                case RaycastOption.NonAlloc:
+                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, QueryTriggerInteraction.Ignore);
+                    break;
+                case RaycastOption.Normal:
+                    if (Physics.Raycast(_ray, out RaycastHit hit, distance, layerMask, QueryTriggerInteraction.Ignore))
+                    {
+                        HitCount = 1;
+                        Hits[0] = hit;
+                    }
+                    break;
+
+            }
 
             return HitCount > 0;
         }
@@ -205,5 +270,11 @@ namespace Services
 
             SetRay(_lastestRayTransform);
         }
+    }
+
+    public enum RaycastOption
+    {
+        NonAlloc,
+        Normal,
     }
 }
