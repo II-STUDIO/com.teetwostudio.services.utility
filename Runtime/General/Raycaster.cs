@@ -146,6 +146,10 @@ namespace Services
                         HitCount = 1;
                         Hits[0] = hit;
                     }
+                    else
+                    {
+                        HitCount = 0;
+                    }
                     break;
 
             }
@@ -178,6 +182,10 @@ namespace Services
                     {
                         HitCount = 1;
                         Hits[0] = hit;
+                    }
+                    else
+                    {
+                        HitCount = 0;
                     }
                     break;
 
@@ -214,6 +222,10 @@ namespace Services
                         HitCount = 1;
                         Hits[0] = hit;
                     }
+                    else
+                    {
+                        HitCount = 0;
+                    }
                     break;
 
             }
@@ -247,6 +259,10 @@ namespace Services
                     {
                         HitCount = 1;
                         Hits[0] = hit;
+                    }
+                    else
+                    {
+                        HitCount = 0;
                     }
                     break;
 
