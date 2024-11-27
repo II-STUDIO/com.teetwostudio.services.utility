@@ -116,9 +116,9 @@ namespace Services
             IsReady = true;
         }
 
-        public void DrawRay()
+        public void DrawRay(float distance, Color color)
         {
-            Debug.DrawRay(_ray.origin, _ray.direction, color: Color.red);
+            Debug.DrawRay(_ray.origin, _ray.direction * distance, color);
         }
 
         /// <summary>
@@ -168,8 +168,6 @@ namespace Services
 
             CheckUseLastedTransformAndAutoSetup();
 
-            HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance);
-
             switch (option)
             {
                 case RaycastOption.NonAlloc:
@@ -211,7 +209,7 @@ namespace Services
                     HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
                     break;
                 case RaycastOption.Normal:
-                    if( Physics.Raycast(_ray,out RaycastHit hit, distance, layerMask))
+                    if (Physics.Raycast(_ray, out RaycastHit hit, distance, layerMask))
                     {
                         HitCount = 1;
                         Hits[0] = hit;
