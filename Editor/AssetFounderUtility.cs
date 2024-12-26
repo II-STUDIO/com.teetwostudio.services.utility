@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -39,6 +40,32 @@ namespace Services.Utility
                 AssetDatabase.CreateAsset(output, resultPath);
                 AssetDatabase.SaveAssets();
             }
+        }
+
+        public static void FoundExistOrCreateSO<T>(string path, out T output) where T : ScriptableObject
+        {
+            output = ScriptableObject.CreateInstance<T>();
+
+            AssetDatabase.Refresh();
+
+            AssetDatabase.CreateAsset(output, path);
+            AssetDatabase.SaveAssets();
+        }
+
+        public static T[] FoundAllAssetTypeAtPath<T>(string path) where T : Object
+        {
+            string typeName = typeof(T).Name;
+
+            string[] guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { path });
+            T[] assets = new T[guids.Length];
+
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+                assets[i] = AssetDatabase.LoadAssetAtPath<T>(assetPath);
+            }
+
+            return assets;
         }
     }
 }
