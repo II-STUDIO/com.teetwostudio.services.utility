@@ -22,6 +22,9 @@ public class CCharpPooler<T> where T : new() {
 
     public void Push(T unit)
     {
+        if (unit == null)
+            return;
+
         schedule.Enqueue(unit);
     }
 }
