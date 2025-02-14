@@ -18,7 +18,15 @@ namespace Services.Utility.Core
             if (inheristers == null || inheristers.Length == 0)
             {
                 string name = typeof(Inherister).Name;
-                Debug.LogWarning($"The type of <{name}> not arriv or found -> auto generate one.");
+
+                bool isNonAutoCreate = typeof(Inherister).IsDefined(typeof(NonAutoCreateSingletonAttribute), false);
+                if (isNonAutoCreate)
+                {
+                    Debug.LogWarning($"The type of <{name}> not arrive or found");
+                    return null;
+                }
+
+                Debug.LogWarning($"The type of <{name}> not arrive or found -> auto generate one.");
                 return new GameObject(name + " - Singleton (Auto Create)").AddComponent<Inherister>();
             }
 
@@ -36,7 +44,7 @@ namespace Services.Utility.Core
         /// <param name="instance"></param>
         /// <param name="replacementType"></param>
         /// <returns></returns>
-        public static Inherister GetInstance<Inherister>(GameObject gameObject, Inherister instance, SigletonPlacementType replacementType = SigletonPlacementType.Noramal) where Inherister : MonoBehaviour
+        public static Inherister GetInstance <Inherister>(GameObject gameObject, Inherister instance, SigletonPlacementType replacementType = SigletonPlacementType.Noramal) where Inherister : MonoBehaviour
         {
             Inherister inheriter = gameObject.GetComponent<Inherister>();
 

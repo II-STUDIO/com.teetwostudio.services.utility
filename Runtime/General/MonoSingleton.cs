@@ -39,9 +39,9 @@ namespace Services
         /// Check the status of this instance static object can't check null form Instance property because Instance property away find the validable access can check only this function.
         /// </summary>
         /// <returns>Ture if 'Instance' not be null</returns>
-        public bool IsInstanceValidable()
+        public static bool IsInstanceValidable
         {
-            return _instance;
+            get => _instance != null;
         }
 
         private void OnApplicationQuit()
