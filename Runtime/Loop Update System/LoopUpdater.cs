@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Services
@@ -8,6 +7,8 @@ namespace Services
     public class LoopUpdater : MonoSingleton<LoopUpdater>
     {
         private HashSet<ILoopUpdateEntity> m_entities = new(200);
+
+        private static readonly List<ILoopUpdateEntity> m_tempList = new(200);
 
         private void Update()
         {
@@ -18,14 +19,13 @@ namespace Services
 
                 float deltaTime = Time.deltaTime;
 
-                var entryValue = m_entities.ToHashSet();
+                m_tempList.Clear();
+                m_tempList.AddRange(m_entities);
 
-                foreach (ILoopUpdateEntity entity in entryValue)
+                for (int i = 0; i < m_tempList.Count; i++)
                 {
-                    if (entity == null)
-                        continue;
-
-                    if (!entity.IsUpdatable)
+                    var entity = m_tempList[i];
+                    if (entity == null || !entity.IsUpdatable)
                         continue;
 
                     try
@@ -35,7 +35,6 @@ namespace Services
                     catch (Exception e)
                     {
                         Debug.LogException(e);
-                        continue;
                     }
                 }
             }
@@ -44,23 +43,13 @@ namespace Services
         public static void EnableEntity(ILoopUpdateEntity entity)
         {
             lock (Instance.m_entities)
-            {
-                if (Instance.m_entities.Contains(entity))
-                    return;
-
                 Instance.m_entities.Add(entity);
-            }
         }
 
         public static void DisableEntity(ILoopUpdateEntity entity)
         {
             lock (Instance.m_entities)
-            {
-                if (!Instance.m_entities.Contains(entity))
-                    return;
-
                 Instance.m_entities.Remove(entity);
-            }
         }
     }
 }
