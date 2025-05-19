@@ -40,13 +40,31 @@ public class ElementQueue<T>
         return item;
     }
 
+    public T Dequeue(int index)
+    {
+        if (_list.Count == 0)
+        {
+            throw new System.ArgumentOutOfRangeException();
+        }
+
+        var item = _list[index];
+        _list.RemoveAt(index);
+
+        return item;
+    }
+
     public void Remove(T item)
     {
-        if(item == null)
+        if (item == null)
             throw new System.ArgumentNullException();
 
         _list.Remove(item);
     }
 
     public void Clear() => _list.Clear();
+
+    public T GetQueue(int index)
+    {
+        return _list[index];
+    }
 }
