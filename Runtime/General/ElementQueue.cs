@@ -49,6 +49,34 @@ public class ElementQueue<T>
     }
 
     /// <summary>
+    /// Removes and returns the item at the given index (0 = front of queue).
+    /// </summary>
+    public T DequeueAt(int index)
+    {
+        if (index < 0 || index >= _count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        int realIndex = (_head + index) % _buffer.Length;
+        T item = _buffer[realIndex];
+
+        // Shift elements to fill the gap
+        for (int i = realIndex; i != _tail; i = (i + 1) % _buffer.Length)
+        {
+            int next = (i + 1) % _buffer.Length;
+            if (next != _tail)
+                _buffer[i] = _buffer[next];
+            else
+                _buffer[i] = default!;
+        }
+
+        _tail = (_tail == 0) ? _buffer.Length - 1 : _tail - 1;
+        _count--;
+
+        return item;
+    }
+
+
+    /// <summary>
     /// Returns item at front without removing.
     /// </summary>
     public T Peek()
