@@ -4,16 +4,17 @@ namespace Services
 {
     public abstract class LoopUpdateMonoBehaviour : MonoBehaviour, ILoopUpdateEntity
     {
-        public bool IsUpdatable
-        {
-            get => m_isFirstFrameEntry && isActiveAndEnabled;
-        }
+        private bool _hasStarted = false;
 
-        private bool m_isFirstFrameEntry = false;
+        /// <summary>
+        /// Indicates if this entity is ready for update:
+        /// Must have started and be active/enabled.
+        /// </summary>
+        public bool IsUpdatable => _hasStarted && isActiveAndEnabled;
 
         protected virtual void Start()
         {
-            m_isFirstFrameEntry = true;
+            _hasStarted = true;
         }
 
         protected virtual void OnEnable()

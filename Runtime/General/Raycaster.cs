@@ -3,292 +3,183 @@ using UnityEngine;
 namespace Services
 {
     /// <summary>
-    /// This is optimize raycast to not caste allocator physic and resuse the raycast hit property in 3D.
+    /// Optimized reusable raycaster for 3D physics with optional non-allocating behavior.
     /// </summary>
     public class Raycaster
     {
-        private RaycastOption option;
-        /// <summary>
-        /// Dedicate new not allocat physic raycaster defualt container size is -> 1.
-        /// </summary>
-        public Raycaster(RaycastOption option)
-        {
-            this.option = option;
+        private Ray _ray;
+        private Transform _cachedTransform;
 
-            Hits = new RaycastHit[1];
-            HitCount = 0;
-        }
+        private readonly RaycastOption _option;
 
         /// <summary>
-        /// Dedicate new not allocat physic raycaster with custom max container size.
-        /// </summary>
-        public Raycaster(RaycastOption option, int maxHitContainable)
-        {
-            this.option = option;
-
-            Hits = new RaycastHit[maxHitContainable];
-            HitCount = 0;
-        }
-
-        /// <summary>
-        /// Container of the hit of raycast.
+        /// Container for raycast hits.
         /// </summary>
         public RaycastHit[] Hits { get; private set; }
 
         /// <summary>
-        /// Count of currenct of lasted raycast hits maximum is follow 'Hits' lengh.
+        /// Number of hits from the last cast. Max is Hits.Length.
         /// </summary>
         public int HitCount { get; private set; }
 
+        /// <summary>
+        /// Whether the ray is ready for casting.
+        /// </summary>
         public bool IsReady { get; private set; }
 
         /// <summary>
-        /// This property will automatical set the ray every cast funtion follow the lastest transform form 'SetRay(Transform transform)' funtion.
+        /// Automatically update the ray using the latest transform before each cast.
         /// </summary>
-        public bool UseLastestTransform { get; set; }
+        public bool UseCachedTransform { get; set; }
 
         /// <summary>
-        /// Return the firstest raycast hit of the 'Hits' cotnain.
+        /// Returns the first hit from the last cast.
         /// </summary>
-        public RaycastHit FirstHit
+        public RaycastHit FirstHit => Hits[0];
+
+        /// <summary>
+        /// Returns the last hit from the last cast.
+        /// </summary>
+        public RaycastHit LastHit => Hits[HitCount - 1];
+
+        /// <summary>
+        /// Returns true if no objects were hit in the last cast.
+        /// </summary>
+        public bool IsEmpty => HitCount == 0;
+
+        /// <summary>
+        /// Initializes the raycaster with default capacity of 1 hit.
+        /// </summary>
+        public Raycaster(RaycastOption option) : this(option, 1) { }
+
+        /// <summary>
+        /// Initializes the raycaster with a custom max hit capacity.
+        /// </summary>
+        public Raycaster(RaycastOption option, int maxHitCapacity)
         {
-            get => Hits[0];
+            _option = option;
+            Hits = new RaycastHit[maxHitCapacity];
+            HitCount = 0;
         }
 
         /// <summary>
-        /// Return the lasted raycast hit of the 'Hits' cotnain.
+        /// Sets the ray using a transform's position and forward direction.
         /// </summary>
-        public RaycastHit LastHit
-        {
-            get => Hits[HitCount - 1];
-        }
-
-        /// <summary>
-        /// Return when hits is empty.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get => HitCount == 0;
-        }
-
-
-        private Ray _ray;
-        private Transform _lastestRayTransform;
-
-        /// <summary>
-        /// Set the ray property with transform forward for cast the ray.
-        /// </summary>
-        /// <param name="transform"></param>
         public void SetRay(Transform transform)
         {
-            if (!transform)
+            if (transform == null)
             {
-                Debug.LogErrorFormat("Can't set ray because the transform is null or empty");
+                Debug.LogError("Cannot set ray: Transform is null.");
                 return;
             }
 
-            SetRay(transform.position, transform.forward);
-
-            _lastestRayTransform = transform;
+            _ray.origin = transform.position;
+            _ray.direction = transform.forward;
+            _cachedTransform = transform;
+            IsReady = true;
         }
 
         /// <summary>
-        /// Set the ray property for cast the ray.
+        /// Sets the ray manually.
         /// </summary>
-        /// <param name="ray"></param>
+        public void SetRay(Vector3 origin, Vector3 direction)
+        {
+            _ray.origin = origin;
+            _ray.direction = direction;
+            IsReady = true;
+        }
+
+        /// <summary>
+        /// Sets the ray using a Ray object.
+        /// </summary>
         public void SetRay(Ray ray)
         {
             _ray = ray;
-
             IsReady = true;
         }
 
         /// <summary>
-        /// Set the ray property for cast the ray.
+        /// Draws the current ray for debugging.
         /// </summary>
-        /// <param name="position"></param>
-        /// <param name="direction"></param>
-        public void SetRay(Vector3 position, Vector3 direction)
-        {
-            _ray.origin = position;
-            _ray.direction = direction;
-
-            IsReady = true;
-        }
-
         public void DrawRay(float distance, Color color)
         {
             Debug.DrawRay(_ray.origin, _ray.direction * distance, color);
         }
 
         /// <summary>
-        ///  Create reuse raycast to detect the colliders.
+        /// Casts the ray.
         /// </summary>
-        /// <returns>True when hit colliders</returns>
         public bool Cast()
         {
-            if (!IsReady)
-            {
-                Debug.LogWarningFormat("Ray is not ready pleas set ray first");
-                return false;
-            }
-
-            CheckUseLastedTransformAndAutoSetup();
-
-            switch (option)
-            {
-                case RaycastOption.NonAlloc:
-                    HitCount = Physics.RaycastNonAlloc(_ray, Hits);
-                    break;
-                case RaycastOption.Normal:
-                    if (Physics.Raycast(_ray, out RaycastHit hit))
-                    {
-                        HitCount = 1;
-                        Hits[0] = hit;
-                    }
-                    else
-                    {
-                        HitCount = 0;
-                    }
-                    break;
-
-            }
-
-            return HitCount > 0;
+            return CastInternal(float.MaxValue, Physics.DefaultRaycastLayers, QueryTriggerInteraction.UseGlobal);
         }
 
         /// <summary>
-        /// Create reuse raycast to detect the colliders with limit distance.
+        /// Casts the ray with a max distance.
         /// </summary>
-        /// <param name="distance"></param>
-        /// <returns>True when hit colliders</returns>
         public bool Cast(float distance)
         {
-            if (!IsReady)
-            {
-                Debug.LogWarningFormat("Ray is not ready pleas set ray first");
-                return false;
-            }
-
-            CheckUseLastedTransformAndAutoSetup();
-
-            switch (option)
-            {
-                case RaycastOption.NonAlloc:
-                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance);
-                    break;
-                case RaycastOption.Normal:
-                    if (Physics.Raycast(_ray, out RaycastHit hit, distance))
-                    {
-                        HitCount = 1;
-                        Hits[0] = hit;
-                    }
-                    else
-                    {
-                        HitCount = 0;
-                    }
-                    break;
-
-            }
-
-            return HitCount > 0;
+            return CastInternal(distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.UseGlobal);
         }
 
         /// <summary>
-        /// Create reuse raycast to detect the colliders with limit distance and layer filters.
+        /// Casts the ray with a max distance and layer mask.
         /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="layerMask"></param>
-        /// <returns>True when hit colliders that matches layer mask</returns>
         public bool Cast(float distance, LayerMask layerMask)
         {
-            if (!IsReady)
-            {
-                Debug.LogWarningFormat("Ray is not ready pleas set ray first");
-                return false;
-            }
-
-            CheckUseLastedTransformAndAutoSetup();
-
-
-            switch (option)
-            {
-                case RaycastOption.NonAlloc:
-                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask);
-                    break;
-                case RaycastOption.Normal:
-                    if (Physics.Raycast(_ray, out RaycastHit hit, distance, layerMask))
-                    {
-                        HitCount = 1;
-                        Hits[0] = hit;
-                    }
-                    else
-                    {
-                        HitCount = 0;
-                    }
-                    break;
-
-            }
-
-            return HitCount > 0;
+            return CastInternal(distance, layerMask, QueryTriggerInteraction.UseGlobal);
         }
 
         /// <summary>
-        /// Create reuse raycast to detect the colliders with limit distance and layer filters this will ignore trigger collider in the process.
+        /// Casts the ray ignoring trigger colliders.
         /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="layerMask"></param>
-        /// <returns>True when hit colliders that matches layer mask</returns>
         public bool CastIgnoreTrigger(float distance, LayerMask layerMask)
+        {
+            return CastInternal(distance, layerMask, QueryTriggerInteraction.Ignore);
+        }
+
+        private bool CastInternal(float distance, LayerMask layerMask, QueryTriggerInteraction queryTriggerInteraction)
         {
             if (!IsReady)
             {
-                Debug.LogWarningFormat("Ray is not ready pleas set ray first");
+                Debug.LogWarning("Ray is not ready. Call SetRay() first.");
                 return false;
             }
 
-            CheckUseLastedTransformAndAutoSetup();
+            if (UseCachedTransform && _cachedTransform != null)
+            {
+                _ray.origin = _cachedTransform.position;
+                _ray.direction = _cachedTransform.forward;
+            }
 
-            switch (option)
+            switch (_option)
             {
                 case RaycastOption.NonAlloc:
-                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, QueryTriggerInteraction.Ignore);
+                    HitCount = Physics.RaycastNonAlloc(_ray, Hits, distance, layerMask, queryTriggerInteraction);
                     break;
                 case RaycastOption.Normal:
-                    if (Physics.Raycast(_ray, out RaycastHit hit, distance, layerMask, QueryTriggerInteraction.Ignore))
+                    if (Physics.Raycast(_ray, out RaycastHit hit, distance, layerMask, queryTriggerInteraction))
                     {
-                        HitCount = 1;
                         Hits[0] = hit;
+                        HitCount = 1;
                     }
                     else
                     {
                         HitCount = 0;
                     }
                     break;
-
             }
 
             return HitCount > 0;
-        }
-
-        private void CheckUseLastedTransformAndAutoSetup()
-        {
-            if (!UseLastestTransform)
-                return;
-
-            if (!_lastestRayTransform)
-            {
-                Debug.LogWarningFormat("The use lastest transform is not ready nedd to set ray follow 'SetRay(Transform transform)' frist");
-                return;
-            }
-
-            SetRay(_lastestRayTransform);
         }
     }
 
+    /// <summary>
+    /// Raycasting method: Normal alloc or NonAlloc (optimized, requires pre-allocated buffer).
+    /// </summary>
     public enum RaycastOption
     {
         NonAlloc,
-        Normal,
+        Normal
     }
 }

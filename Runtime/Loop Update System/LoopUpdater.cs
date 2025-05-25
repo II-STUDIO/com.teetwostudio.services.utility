@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,50 +7,56 @@ namespace Services
 {
     public class LoopUpdater : MonoSingleton<LoopUpdater>
     {
-        private HashSet<ILoopUpdateEntity> m_entities = new(200);
+        private HashSet<ILoopUpdateEntity> m_entitiesSet = new();
+        private List<ILoopUpdateEntity> m_entitiesList = new();
 
-        private static readonly List<ILoopUpdateEntity> m_tempList = new(200);
+        private ConcurrentQueue<ILoopUpdateEntity> m_addQueue = new();
+        private ConcurrentQueue<ILoopUpdateEntity> m_removeQueue = new();
 
         private void Update()
         {
-            lock (m_entities)
+            // Apply queued adds/removes
+            while (m_addQueue.TryDequeue(out var entityToAdd))
             {
-                if (m_entities.Count == 0)
-                    return;
+                if (entityToAdd != null && m_entitiesSet.Add(entityToAdd))
+                    m_entitiesList.Add(entityToAdd);
+            }
 
-                float deltaTime = Time.deltaTime;
+            while (m_removeQueue.TryDequeue(out var entityToRemove))
+            {
+                if (entityToRemove != null && m_entitiesSet.Remove(entityToRemove))
+                    m_entitiesList.Remove(entityToRemove);
+            }
 
-                m_tempList.Clear();
-                m_tempList.AddRange(m_entities);
+            float deltaTime = Time.deltaTime;
 
-                for (int i = 0; i < m_tempList.Count; i++)
+            for (int i = 0; i < m_entitiesList.Count; i++)
+            {
+                var entity = m_entitiesList[i];
+                if (entity == null || !entity.IsUpdatable)
+                    continue;
+
+                try
                 {
-                    var entity = m_tempList[i];
-                    if (entity == null || !entity.IsUpdatable)
-                        continue;
-
-                    try
-                    {
-                        entity.LoopUpdateEvent(deltaTime);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                    }
+                    entity.LoopUpdateEvent(deltaTime);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
                 }
             }
         }
 
         public static void EnableEntity(ILoopUpdateEntity entity)
         {
-            lock (Instance.m_entities)
-                Instance.m_entities.Add(entity);
+            if (entity == null) return;
+            Instance.m_addQueue.Enqueue(entity);
         }
 
         public static void DisableEntity(ILoopUpdateEntity entity)
         {
-            lock (Instance.m_entities)
-                Instance.m_entities.Remove(entity);
+            if (entity == null) return;
+            Instance.m_removeQueue.Enqueue(entity);
         }
     }
 }

@@ -1,70 +1,132 @@
+using System;
 using System.Collections.Generic;
 
 public class ElementQueue<T>
 {
-    private List<T> _list;
+    private T[] _buffer;
+    private int _head; // points to dequeue position
+    private int _tail; // points to enqueue position
+    private int _count;
 
-    public int Count => _list.Count;
+    public int Count => _count;
 
     public ElementQueue(int capacity)
     {
-        _list = new List<T>(capacity);
+        if (capacity <= 0) throw new ArgumentException("Capacity must be > 0");
+        _buffer = new T[capacity];
+        _head = 0;
+        _tail = 0;
+        _count = 0;
     }
 
+    /// <summary>
+    /// Adds item at the end of the queue.
+    /// Throws if capacity exceeded.
+    /// </summary>
     public void Enqueue(T item)
     {
-        _list.Add(item);
+        if (_count == _buffer.Length)
+            throw new InvalidOperationException("Queue capacity exceeded");
+
+        _buffer[_tail] = item;
+        _tail = (_tail + 1) % _buffer.Length;
+        _count++;
     }
 
-    public bool TryRemove(T item)
-    {
-        if (item == null)
-            throw new System.ArgumentNullException();
-
-        if (!_list.Contains(item))
-            return false;
-
-        return _list.Remove(item);
-    }
-
+    /// <summary>
+    /// Removes and returns the item at the front of the queue.
+    /// </summary>
     public T Dequeue()
     {
-        if (_list.Count == 0)
-        {
-            throw new System.ArgumentOutOfRangeException();
-        }
+        if (_count == 0)
+            throw new InvalidOperationException("Queue is empty");
 
-        var item = _list[0];
-        _list.RemoveAt(0);
-
+        T item = _buffer[_head];
+        _buffer[_head] = default!; // clear reference for GC
+        _head = (_head + 1) % _buffer.Length;
+        _count--;
         return item;
     }
 
-    public T Dequeue(int index)
+    /// <summary>
+    /// Returns item at front without removing.
+    /// </summary>
+    public T Peek()
     {
-        if (_list.Count == 0)
+        if (_count == 0)
+            throw new InvalidOperationException("Queue is empty");
+
+        return _buffer[_head];
+    }
+
+    /// <summary>
+    /// Attempts to remove first occurrence of item from queue.
+    /// Returns true if found and removed.
+    /// </summary>
+    public bool TryRemove(T item)
+    {
+        if (_count == 0) return false;
+
+        int index = -1;
+        EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+
+        // Find item in circular buffer
+        for (int i = 0; i < _count; i++)
         {
-            throw new System.ArgumentOutOfRangeException();
+            int bufferIndex = (_head + i) % _buffer.Length;
+            if (comparer.Equals(_buffer[bufferIndex], item))
+            {
+                index = bufferIndex;
+                break;
+            }
         }
 
-        var item = _list[index];
-        _list.RemoveAt(index);
+        if (index == -1) return false;
 
-        return item;
+        // Shift elements to fill gap, maintaining circular order
+        for (int i = index; i != _tail; i = (i + 1) % _buffer.Length)
+        {
+            int next = (i + 1) % _buffer.Length;
+            if (next != _tail)
+                _buffer[i] = _buffer[next];
+            else
+                _buffer[i] = default!;
+        }
+
+        _tail = (_tail == 0) ? _buffer.Length - 1 : _tail - 1;
+        _count--;
+        return true;
     }
 
-    public void Remove(T item)
+    /// <summary>
+    /// Clears the queue.
+    /// </summary>
+    public void Clear()
     {
-        if (item == null)
-            throw new System.ArgumentNullException();
+        if (_count == 0) return;
 
-        _list.Remove(item);
+        if (_head < _tail)
+        {
+            Array.Clear(_buffer, _head, _count);
+        }
+        else
+        {
+            Array.Clear(_buffer, _head, _buffer.Length - _head);
+            Array.Clear(_buffer, 0, _tail);
+        }
+
+        _head = 0;
+        _tail = 0;
+        _count = 0;
     }
 
-    public void Clear() => _list.Clear();
-
-    public T GetQueue(int index)
+    /// <summary>
+    /// Gets the element at specified queue index (0 = front).
+    /// </summary>
+    public T GetAt(int index)
     {
-        return _list[index];
+        if (index < 0 || index >= _count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+        return _buffer[(_head + index) % _buffer.Length];
     }
 }

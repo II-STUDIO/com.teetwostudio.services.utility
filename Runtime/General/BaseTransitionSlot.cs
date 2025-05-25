@@ -12,7 +12,7 @@ namespace Services
 
         public abstract float Time { get; }
 
-        public bool isProcessing { get; private set; } = false;
+        public bool IsProcessing { get; private set; }
 
         public void SetListener(EventAction onBegin, EventAction onComplete)
         {
@@ -22,16 +22,18 @@ namespace Services
 
         public virtual void Begin()
         {
-            _onBegin?.Invoke();
+            if (IsProcessing) return;
 
-            isProcessing = true;
+            _onBegin?.Invoke();
+            IsProcessing = true;
         }
 
         public virtual void Completed()
         {
-            _onComplete?.Invoke();
+            if (!IsProcessing) return;
 
-            isProcessing = false;
+            _onComplete?.Invoke();
+            IsProcessing = false;
         }
 
         public virtual void ForceCompleted()

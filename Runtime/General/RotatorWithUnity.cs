@@ -10,16 +10,18 @@ namespace Services
         [SerializeField] private Vector3 axis = Vector3.forward;
         [SerializeField] private float multple = 1f;
 
-        Transform m_transform;
+        private Transform _transform;
+        private Vector3 _rotationPerSecond;
 
-        private void Start()
+        private void Awake()
         {
-            m_transform = transform;
+            _transform = transform;
+            _rotationPerSecond = axis * multple;
         }
 
         private void Update()
         {
-            m_transform.Rotate(axis * multple * Time.deltaTime);
+            _transform.Rotate(_rotationPerSecond * Time.deltaTime, Space.Self);
         }
     }
 }
