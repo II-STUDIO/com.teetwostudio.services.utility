@@ -5,12 +5,25 @@ namespace Services
     public abstract class LoopUpdateMonoBehaviour : MonoBehaviour, ILoopUpdateEntity
     {
         private bool _hasStarted = false;
+        public virtual bool awayUpdate { get; protected set; } = false;
 
         /// <summary>
         /// Indicates if this entity is ready for update:
         /// Must have started and be active/enabled.
         /// </summary>
-        public bool IsUpdatable => _hasStarted && isActiveAndEnabled;
+        public bool IsUpdatable
+        {
+            get
+            {
+                if (!_hasStarted)
+                    return false;
+
+                if (awayUpdate)
+                    return true;
+
+                return isActiveAndEnabled;
+            }
+        }
 
         protected virtual void Start()
         {
